@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gémeo Digital · Tiago Rodrigues</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0c12;--bg2:#11141d;--bg3:#181c28;--bg4:#1e2333;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.11);--b3:rgba(255,255,255,.18);
+  --ink:#e6e2d8;--ink2:#98968e;--ink3:#5c5b55;
+  --blue:#4477ff;--blue2:#7aa0ff;--bluebg:rgba(68,119,255,.12);
+  --teal:#2bb89a;--teal2:#4dd4b8;--tealbg:rgba(43,184,154,.1);
+  --gold:#c4903a;--gold2:#e8b464;--goldbg:rgba(196,144,58,.1);
+  --red:#e04f4f;--redbg:rgba(224,79,79,.1);
+  --green:#3dbe78;--r:10px;--r2:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;font-size:13px;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+/* MODAL */
+#modal{position:fixed;inset:0;z-index:999;background:rgba(6,8,14,.94);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px}
+.mbox{background:var(--bg2);border:1px solid var(--b2);border-radius:var(--r2);padding:36px;max-width:460px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.mlogo{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#162050,#0a1430);border:1px solid rgba(68,119,255,.3);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;color:var(--blue2);margin-bottom:18px;letter-spacing:-.02em}
+.mbox h2{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:400;color:var(--ink);margin-bottom:8px;line-height:1.3}
+.mbox h2 em{font-style:italic;color:var(--blue2)}
+.mbox p{font-size:12.5px;color:var(--ink2);line-height:1.65;margin-bottom:18px}
+.mbox p strong{color:var(--ink);font-weight:500}
+.steps{background:var(--bg3);border-radius:var(--r);padding:14px 16px;margin-bottom:18px;border:1px solid var(--b1)}
+.step{display:flex;align-items:flex-start;gap:10px;padding:5px 0;font-size:12px;color:var(--ink2);line-height:1.5}
+.stn{width:20px;height:20px;border-radius:50%;background:var(--bluebg);color:var(--blue2);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;border:1px solid rgba(68,119,255,.25)}
+.step a{color:var(--blue2);text-decoration:none;font-weight:500}
+.step a:hover{text-decoration:underline}
+.merr{font-size:12px;color:var(--red);background:var(--redbg);border:1px solid rgba(224,79,79,.2);padding:8px 12px;border-radius:8px;margin-bottom:12px;display:none}
+.mbox input{width:100%;padding:11px 14px;background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r);color:var(--ink);font-family:'Inter',sans-serif;font-size:13px;outline:none;margin-bottom:12px;transition:border-color .15s}
+.mbox input:focus{border-color:rgba(68,119,255,.5)}
+.mbox input::placeholder{color:var(--ink3)}
+.mbtn{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s}
+.mbtn:hover{background:var(--blue2)}
+.mnote{font-size:11px;color:var(--ink3);text-align:center;margin-top:12px;line-height:1.6}
+
+/* TOPBAR */
+.tb{display:flex;align-items:center;gap:14px;padding:0 22px;height:54px;border-bottom:1px solid var(--b1);background:var(--bg2);flex-shrink:0;z-index:5}
+.tl{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.lm{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#162050,#0a1430);border:1px solid rgba(68,119,255,.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--blue2);letter-spacing:-.02em}
+.lt .top{font-size:13px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.lt .bot{font-size:10px;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-top:1px}
+.tdv{width:1px;height:22px;background:var(--b2);flex-shrink:0}
+.tttl{font-family:'Playfair Display',serif;font-style:italic;font-size:14px;color:var(--ink2)}
+.tr{margin-left:auto;display:flex;align-items:center;gap:9px}
+.badge{font-size:10px;padding:3px 9px;border-radius:20px;border:1px solid;letter-spacing:.04em;text-transform:uppercase;font-weight:500}
+.be{color:var(--teal2);border-color:rgba(43,184,154,.3);background:var(--tealbg)}
+.bp{color:var(--blue2);border-color:rgba(68,119,255,.3);background:var(--bluebg)}
+.stat{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink2)}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.ibtn{width:29px;height:29px;border-radius:7px;border:1px solid var(--b2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink2);transition:all .15s}
+.ibtn:hover{color:var(--ink);border-color:var(--b3)}
+.ibtn svg{width:13px;height:13px}
+
+/* LAYOUT */
+.main{display:flex;flex:1;overflow:hidden}
+
+/* SIDEBAR */
+.sb{width:228px;flex-shrink:0;border-right:1px solid var(--b1);background:var(--bg2);display:flex;flex-direction:column;padding:16px 0;overflow-y:auto}
+.ss{padding:0 13px;margin-bottom:20px}
+.sl{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);padding:0 5px;margin-bottom:7px;font-weight:600}
+.si{display:flex;align-items:center;gap:9px;padding:7.5px 10px;border-radius:8px;cursor:pointer;transition:background .12s,color .12s;color:var(--ink2);font-size:12.5px;border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif}
+.si:hover{background:var(--bg3);color:var(--ink)}
+.si.active{background:var(--bluebg);color:var(--blue2)}
+.si svg{width:14px;height:14px;flex-shrink:0;opacity:.8}
+.sp{padding:13px;margin:0 13px;border-radius:var(--r);background:var(--bg3);border:1px solid var(--b2)}
+.sav{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#162050,#0a1430);border:1px solid rgba(68,119,255,.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--blue2);margin-bottom:9px;letter-spacing:-.02em}
+.spn{font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:2px;letter-spacing:-.01em}
+.sps{font-size:10.5px;color:var(--ink3);line-height:1.5}
+
+/* CONTENT */
+.ct{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.tabs{display:flex;border-bottom:1px solid var(--b1);background:var(--bg2);padding:0 22px;flex-shrink:0;height:40px}
+.tab{padding:0 15px;font-size:12px;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;white-space:nowrap;border-top:none;border-left:none;border-right:none;background:none;font-family:'Inter',sans-serif;display:flex;align-items:center;margin-bottom:-1px;font-weight:500}
+.tab:hover{color:var(--ink2)}
+.tab.active{color:var(--blue2);border-bottom-color:var(--blue)}
+.panel{display:none;flex:1;overflow:hidden}
+.panel.active{display:flex;flex-direction:column}
+
+/* CHAT */
+#pc{flex-direction:row}
+.ca{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.msgs{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:13px;scroll-behavior:smooth}
+.msgs::-webkit-scrollbar{width:3px}
+.msgs::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+.wlc{text-align:center;padding:36px 20px 20px;max-width:500px;margin:0 auto}
+.wico{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#162050,#0a1430);border:1px solid rgba(68,119,255,.28);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600;color:var(--blue2);margin:0 auto 18px;letter-spacing:-.02em}
+.wlc h3{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:400;color:var(--ink);margin-bottom:8px;line-height:1.3}
+.wlc h3 em{font-style:italic;color:var(--blue2)}
+.wlc p{font-size:12.5px;color:var(--ink2);line-height:1.65;margin-bottom:20px;max-width:420px;margin-left:auto;margin-right:auto}
+.qbtns{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.qbtn{font-size:11.5px;padding:5px 12px;border-radius:20px;border:1px solid var(--b2);background:var(--bg2);color:var(--ink2);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
+.qbtn:hover{border-color:var(--blue);color:var(--blue2);background:var(--bluebg)}
+
+.mrow{display:flex;gap:10px;align-items:flex-end}
+.mrow.user{flex-direction:row-reverse}
+.mav{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;border:1px solid var(--b2);letter-spacing:-.02em}
+.mav.ai{background:linear-gradient(135deg,#162050,#0a1430);color:var(--blue2)}
+.mav.usr{background:var(--bg3);color:var(--ink2)}
+.mwrap{max-width:76%}
+.mlbl{font-size:10px;color:var(--ink3);margin-bottom:4px;display:flex;align-items:center;gap:5px;font-weight:500}
+.ldot{width:5px;height:5px;border-radius:50%;background:var(--blue)}
+.mbub{padding:11px 14px;border-radius:13px;font-size:13.5px;line-height:1.68;border:1px solid var(--b1)}
+.mrow.ai .mbub{background:var(--bg2);border-top-left-radius:3px;color:var(--ink)}
+.mrow.user .mbub{background:rgba(68,119,255,.13);border:1px solid rgba(68,119,255,.22);border-top-right-radius:3px;color:#cddcff}
+.mbub p+p{margin-top:7px}
+.mbub ul{padding-left:17px;margin:5px 0}
+.mbub li{margin:3px 0}
+.mbub strong{color:var(--blue2);font-weight:600}
+.mbub em{color:var(--gold2);font-style:normal;font-weight:500}
+.es{display:flex;align-items:center;gap:6px;margin-top:9px;padding:5px 10px;border-radius:6px;font-size:11px;border:1px solid;font-weight:500}
+.es-ok{background:var(--tealbg);border-color:rgba(43,184,154,.22);color:var(--teal2)}
+.es-warn{background:var(--goldbg);border-color:rgba(196,144,58,.22);color:var(--gold2)}
+.es-blk{background:var(--redbg);border-color:rgba(224,79,79,.22);color:var(--red)}
+
+.typing{display:flex;align-items:center;gap:4px;padding:6px 2px}
+.td{width:5px;height:5px;border-radius:50%;background:var(--ink3);animation:blink 1.2s ease-in-out infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2;transform:scale(.78)}40%{opacity:1;transform:scale(1)}}
+.sarow{display:flex;gap:5px;flex-wrap:wrap;padding-left:40px}
+.schip{font-size:10px;padding:3px 8px;border-radius:20px;border:1px solid;display:flex;align-items:center;gap:4px;font-weight:500}
+.sc-e{color:var(--teal2);border-color:rgba(43,184,154,.24);background:var(--tealbg)}
+.sc-p{color:var(--blue2);border-color:rgba(68,119,255,.24);background:var(--bluebg)}
+.spin{display:inline-block;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.ia{padding:13px 22px 15px;border-top:1px solid var(--b1);background:var(--bg2);flex-shrink:0}
+.ir{display:flex;align-items:flex-end;gap:9px;max-width:820px;margin:0 auto}
+#inp{flex:1;min-height:41px;max-height:108px;padding:10px 13px;background:var(--bg3);border:1px solid var(--b2);border-radius:11px;color:var(--ink);font-family:'Inter',sans-serif;font-size:13.5px;resize:none;outline:none;line-height:1.5;transition:border-color .15s}
+#inp:focus{border-color:rgba(68,119,255,.42)}
+#inp::placeholder{color:var(--ink3)}
+#sbtn{width:41px;height:41px;border-radius:11px;background:var(--blue);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+#sbtn:hover{background:var(--blue2);transform:translateY(-1px)}
+#sbtn:disabled{background:var(--bg4);cursor:default;transform:none}
+#sbtn svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.inote{text-align:center;font-size:10.5px;color:var(--ink3);margin-top:7px}
+
+.csb{width:248px;flex-shrink:0;border-left:1px solid var(--b1);background:var(--bg2);padding:17px;overflow-y:auto;display:flex;flex-direction:column;gap:15px}
+.csl{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:9px;font-weight:600}
+.ac{border:1px solid var(--b1);border-radius:var(--r);padding:12px;background:var(--bg3);transition:border-color .2s,box-shadow .2s}
+.ac.glow{border-color:rgba(68,119,255,.38);box-shadow:0 0 16px rgba(68,119,255,.09)}
+.ach{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.aci{width:29px;height:29px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;font-weight:600}
+.ic{background:var(--bluebg);color:var(--blue2)}
+.ie{background:var(--tealbg);color:var(--teal2)}
+.acn{font-size:12px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.acr{font-size:10px;color:var(--ink3);margin-top:1px}
+.acb{font-size:11px;color:var(--ink2);line-height:1.58}
+.acs{display:flex;align-items:center;gap:4px;margin-top:8px;font-size:10px;color:var(--teal2);font-weight:500}
+.acd{width:5px;height:5px;border-radius:50%;background:var(--teal);animation:pulse 2s ease-in-out infinite}
+.norms{display:flex;flex-direction:column;gap:5px}
+.norm{font-size:10.5px;color:var(--ink2);padding:5px 9px;background:var(--bg3);border-radius:6px;border:1px solid var(--b1);font-weight:500}
+
+/* DASHBOARD */
+#pd{padding:22px;overflow-y:auto;flex-direction:column;gap:13px}
+.dg{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:2px}
+.mc{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px}
+.mcl{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);margin-bottom:6px;font-weight:600}
+.mcv{font-size:24px;font-weight:600;color:var(--ink);letter-spacing:-.02em;margin-bottom:4px}
+.mcs{font-size:11px}
+.cup{color:var(--green)}.cne{color:var(--ink3)}
+.dr{display:grid;grid-template-columns:1.4fr 1fr;gap:11px}
+.dc{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:17px}
+.dct{font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:14px;letter-spacing:-.01em}
+.bars{display:flex;align-items:flex-end;gap:6px;height:88px}
+.bc{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.bf{width:100%;border-radius:3px 3px 0 0;opacity:.72;transition:opacity .2s}
+.bf:hover{opacity:1}
+.bl{font-size:9.5px;color:var(--ink3);font-weight:500}
+.pipe{display:flex;flex-direction:column;gap:7px}
+.pi{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;background:var(--bg3);border:1px solid var(--b1)}
+.pid{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.pin{flex:1;font-size:12px;color:var(--ink2)}
+.pis{font-size:10px;padding:2px 8px;border-radius:20px;border:1px solid;font-weight:500}
+.ps1{color:var(--blue2);border-color:rgba(68,119,255,.3);background:var(--bluebg)}
+.ps2{color:var(--gold2);border-color:rgba(196,144,58,.3);background:var(--goldbg)}
+.ps3{color:var(--teal2);border-color:rgba(43,184,154,.3);background:var(--tealbg)}
+
+/* PERFIL */
+#pp{padding:24px;overflow-y:auto;flex-direction:column;gap:13px;max-width:820px}
+.ph{display:flex;align-items:flex-start;gap:20px;padding:22px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r2)}
+.phav{width:70px;height:70px;border-radius:17px;background:linear-gradient(135deg,#162050,#0a1430);border:1px solid rgba(68,119,255,.28);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600;color:var(--blue2);flex-shrink:0;letter-spacing:-.02em}
+.phi h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:400;color:var(--ink);margin-bottom:5px}
+.phi p{font-size:12.5px;color:var(--ink2);line-height:1.65;margin-bottom:10px}
+.ph-tags{display:flex;flex-wrap:wrap;gap:5px}
+.ptag{font-size:10.5px;padding:3px 9px;border-radius:20px;border:1px solid var(--b2);color:var(--ink2);font-weight:500}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.pcard{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:15px}
+.pct{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:10px;font-weight:600}
+.pci{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid var(--b1);font-size:12px;color:var(--ink2);line-height:1.45}
+.pci:last-child{border-bottom:none}
+.pcd{width:4px;height:4px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:6px}
+
+/* SOBRE */
+#ps{padding:24px;overflow-y:auto;flex-direction:column;gap:12px;max-width:760px}
+.soc{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:19px}
+.sot{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:9px;letter-spacing:-.01em}
+.sob{font-size:12.5px;color:var(--ink2);line-height:1.75}
+.sob p+p{margin-top:9px}
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:11px}
+.fs{font-size:11px;padding:5px 12px;border-radius:7px;background:var(--bg3);border:1px solid var(--b2);color:var(--ink);white-space:nowrap;font-weight:500}
+.fa{color:var(--ink3);font-size:12px}
+
+.fade{opacity:0;transform:translateY(7px);animation:fu .25s ease forwards}
+@keyframes fu{to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+@media(max-width:980px){.csb{display:none}}
+@media(max-width:720px){.sb{display:none}.dg{grid-template-columns:repeat(2,1fr)}.dr{grid-template-columns:1fr}.pgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- MODAL -->
+<div id="modal">
+  <div class="mbox">
+    <div class="mlogo">TR</div>
+    <h2>Bem-vindo ao <em>Gémeo Digital</em><br>do Tiago Rodrigues</h2>
+    <p>Para activar o agente, precisas de uma chave da <strong>API Groq</strong> — é <strong>100% gratuita</strong>, sem cartão de crédito, só um email.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="stn">1</div>
+        <span>Vai a <a href="https://console.groq.com" target="_blank">console.groq.com</a> e cria uma conta com o teu email</span>
+      </div>
+      <div class="step">
+        <div class="stn">2</div>
+        <span>No menu lateral clica em <strong style="color:var(--ink)">API Keys</strong> → <strong style="color:var(--ink)">Create API Key</strong></span>
+      </div>
+      <div class="step">
+        <div class="stn">3</div>
+        <span>Copia a chave gerada (começa por <strong style="color:var(--ink)">gsk_</strong>) e cola aqui em baixo</span>
+      </div>
+    </div>
+    <div class="merr" id="merr">A chave deve começar por "gsk_". Copia directamente do Groq Console.</div>
+    <input type="password" id="apikey" placeholder="gsk_..." autocomplete="off">
+    <button class="mbtn" onclick="activar()">Activar Gémeo Digital — Gratuito</button>
+    <div class="mnote">A chave fica guardada apenas no teu browser · Nunca enviada para nenhum servidor<br>Limite gratuito: 14.400 conversas/dia · Sem custos · Sem cartão</div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="tb">
+  <div class="tl">
+    <div class="lm">TR</div>
+    <div class="lt">
+      <div class="top">Gémeo Digital</div>
+      <div class="bot">Tiago Rodrigues · ISCAC</div>
+    </div>
+  </div>
+  <div class="tdv"></div>
+  <div class="tttl">Dashboard Fintech &amp; Ciência de Dados</div>
+  <div class="tr">
+    <span class="badge be">⚖ Ética</span>
+    <span class="badge bp">◉ Psicologia</span>
+    <div class="tdv"></div>
+    <div class="stat"><div class="sdot"></div>Online</div>
+    <button class="ibtn" onclick="resetKey()" title="Mudar chave de API">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="sb">
+    <div class="ss">
+      <div class="sp">
+        <div class="sav">TR</div>
+        <div class="spn">Tiago S. Rodrigues</div>
+        <div class="sps">Ciência de Dados para a Gestão<br>ISCAC · 2.º ano</div>
+      </div>
+    </div>
+    <div class="ss">
+      <div class="sl">Navegação</div>
+      <button class="si active" data-t="chat" onclick="nav('chat',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Conversa com IA
+      </button>
+      <button class="si" data-t="dash" onclick="nav('dash',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard
+      </button>
+      <button class="si" data-t="perfil" onclick="nav('perfil',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Perfil
+      </button>
+      <button class="si" data-t="sobre" onclick="nav('sobre',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Sobre o projecto
+      </button>
+    </div>
+    <div class="ss">
+      <div class="sl">Acesso rápido</div>
+      <button class="si" onclick="qs('Que ideias tens para o Poliempreende em fintech?')">Poliempreende</button>
+      <button class="si" onclick="qs('Como pode a ciência de dados apoiar a gestão financeira?')">Ciência de dados</button>
+      <button class="si" onclick="qs('O que é ética em IA aplicada a fintech?')">Ética em IA</button>
+      <button class="si" onclick="qs('Como devo lidar com um cliente insatisfeito?')">Clientes</button>
+    </div>
+  </div>
+
+  <div class="ct">
+    <div class="tabs">
+      <button class="tab active" id="t-chat" onclick="navTab('chat')">Conversa</button>
+      <button class="tab" id="t-dash" onclick="navTab('dash')">Dashboard</button>
+      <button class="tab" id="t-perfil" onclick="navTab('perfil')">Perfil</button>
+      <button class="tab" id="t-sobre" onclick="navTab('sobre')">Sobre</button>
+    </div>
+
+    <!-- CHAT -->
+    <div class="panel active" id="pc">
+      <div class="ca">
+        <div class="msgs" id="msgs">
+          <div class="wlc fade" id="wlc">
+            <div class="wico">TR</div>
+            <h3>Olá, sou o <em>Gémeo Digital</em><br>do Tiago Rodrigues</h3>
+            <p>Representação digital académica e profissional autorizada. Orientado para fintech, ciência de dados e gestão. Supervisão ética e psicológica activa em todas as respostas.</p>
+            <div class="qbtns">
+              <button class="qbtn" onclick="qs('Quem és e o que podes fazer?')">Quem és?</button>
+              <button class="qbtn" onclick="qs('Fala-me sobre o teu percurso académico.')">Percurso académico</button>
+              <button class="qbtn" onclick="qs('Que competências técnicas tens?')">Competências</button>
+              <button class="qbtn" onclick="qs('Que ideias tens para o Poliempreende em fintech?')">Poliempreende</button>
+              <button class="qbtn" onclick="qs('O que é fintech e qual a sua relevância?')">Fintech</button>
+              <button class="qbtn" onclick="qs('Como a ciência de dados apoia a gestão financeira?')">Ciência de dados</button>
+              <button class="qbtn" onclick="qs('Devo investir todas as poupanças num activo de risco?')">Decisão financeira</button>
+            </div>
+          </div>
+        </div>
+        <div class="ia">
+          <div class="ir">
+            <textarea id="inp" placeholder="Pergunta-me alguma coisa…" rows="1" onkeydown="hk(event)" oninput="ar(this)"></textarea>
+            <button id="sbtn" onclick="send()">
+              <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+          <div class="inote">Supervisão ética (RGPD · MiFID II · EU AI Act) e psicológica activa · Não substitui aconselhamento profissional</div>
+        </div>
+      </div>
+      <div class="csb">
+        <div>
+          <div class="csl">Agentes activos</div>
+          <div class="ac" id="acore" style="margin-bottom:9px">
+            <div class="ach"><div class="aci ic">◈</div><div><div class="acn">Gémeo Digital</div><div class="acr">Agente principal</div></div></div>
+            <div class="acb">Representa o perfil académico e profissional do Tiago. Responde com base no currículo real.</div>
+            <div class="acs"><div class="acd"></div>Online</div>
+          </div>
+          <div class="ac" id="aeth" style="margin-bottom:9px">
+            <div class="ach"><div class="aci ie">⚖</div><div><div class="acn">Subagente de Ética</div><div class="acr">RGPD · MiFID II · AI Act</div></div></div>
+            <div class="acb">Verifica conformidade normativa antes de cada resposta sensível.</div>
+            <div class="acs"><div class="acd"></div>A monitorizar</div>
+          </div>
+          <div class="ac" id="apsy">
+            <div class="ach"><div class="aci ic">◉</div><div><div class="acn">Subagente de Psicologia</div><div class="acr">Comportamento · Tom</div></div></div>
+            <div class="acb">Adapta o tom da resposta ao estado emocional e literacia do utilizador.</div>
+            <div class="acs"><div class="acd"></div>A monitorizar</div>
+          </div>
+        </div>
+        <div>
+          <div class="csl">Quadro normativo</div>
+          <div class="norms">
+            <span class="norm">RGPD · Reg. 2016/679</span>
+            <span class="norm">EU AI Act · Reg. 2024/1689</span>
+            <span class="norm">MiFID II · Dir. 2014/65/UE</span>
+            <span class="norm">PSD2 · Dir. 2015/2366</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="panel" id="pd">
+      <div class="dg">
+        <div class="mc"><div class="mcl">Interacções</div><div class="mcv" id="mi">0</div><div class="mcs cup">▲ Sessão actual</div></div>
+        <div class="mc"><div class="mcl">Verificações éticas</div><div class="mcv" id="me">0</div><div class="mcs cne">Sub-agente ética</div></div>
+        <div class="mc"><div class="mcl">Análises psicológicas</div><div class="mcv" id="mp">0</div><div class="mcs cne">Sub-agente psicologia</div></div>
+        <div class="mc"><div class="mcl">Conformidade</div><div class="mcv">100%</div><div class="mcs cup">▲ Todas validadas</div></div>
+      </div>
+      <div class="dr">
+        <div class="dc">
+          <div class="dct">Áreas de conhecimento cobertas</div>
+          <div class="bars">
+            <div class="bc"><div class="bf" style="height:82%;background:var(--blue)"></div><div class="bl">Fintech</div></div>
+            <div class="bc"><div class="bf" style="height:72%;background:var(--teal)"></div><div class="bl">Dados</div></div>
+            <div class="bc"><div class="bf" style="height:66%;background:var(--gold)"></div><div class="bl">Gestão</div></div>
+            <div class="bc"><div class="bf" style="height:57%;background:var(--blue)"></div><div class="bl">Académico</div></div>
+            <div class="bc"><div class="bf" style="height:50%;background:var(--teal)"></div><div class="bl">Carreira</div></div>
+            <div class="bc"><div class="bf" style="height:46%;background:var(--gold)"></div><div class="bl">Empreend.</div></div>
+          </div>
+        </div>
+        <div class="dc">
+          <div class="dct">Pipeline de competências</div>
+          <div class="pipe">
+            <div class="pi"><div class="pid" style="background:var(--teal)"></div><div class="pin">Ciência de Dados</div><span class="pis ps3">Em curso</span></div>
+            <div class="pi"><div class="pid" style="background:var(--blue)"></div><div class="pin">Visual Studio · Radzen</div><span class="pis ps3">Activo</span></div>
+            <div class="pi"><div class="pid" style="background:var(--gold)"></div><div class="pin">Python · SQL</div><span class="pis ps2">Em desenv.</span></div>
+            <div class="pi"><div class="pid" style="background:var(--blue)"></div><div class="pin">Ética em IA</div><span class="pis ps1">A explorar</span></div>
+            <div class="pi"><div class="pid" style="background:var(--teal)"></div><div class="pin">Poliempreende 2025</div><span class="pis ps2">Activo</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERFIL -->
+    <div class="panel" id="pp">
+      <div class="ph">
+        <div class="phav">TR</div>
+        <div class="phi">
+          <h2>Tiago Simões Rodrigues</h2>
+          <p>Estudante de Ciência de Dados para a Gestão no ISCAC (Instituto Politécnico de Coimbra), 2.º ano. Participante no Concurso Poliempreende 2025.</p>
+          <div class="ph-tags">
+            <span class="ptag">Fintech</span><span class="ptag">Ciência de Dados</span><span class="ptag">Gestão</span>
+            <span class="ptag">Poliempreende</span><span class="ptag">Ética em IA</span>
+          </div>
+        </div>
+      </div>
+      <div class="pgrid">
+        <div class="pcard"><div class="pct">Formação académica</div>
+          <div class="pci"><div class="pcd"></div><span>Ciência de Dados para a Gestão — ISCAC/IPC (2023–presente)</span></div>
+          <div class="pci"><div class="pcd"></div><span>Ciências e Tecnologia — Esc. Sec. Fernando Namora (2019–2022) · Média 15</span></div>
+          <div class="pci"><div class="pcd"></div><span>Poliempreende 2025 — participante activo</span></div>
+        </div>
+        <div class="pcard"><div class="pct">Experiência profissional</div>
+          <div class="pci"><div class="pcd"></div><span>Operador TeleMarketing — Grupo Litocar, Coimbra (jan. 2023 – abr. 2025)</span></div>
+          <div class="pci"><div class="pcd"></div><span>Colaborador / Serviço de mesa — Assoc. Clube Condeixa (jul. 2022 – jul. 2024)</span></div>
+        </div>
+        <div class="pcard"><div class="pct">Competências técnicas</div>
+          <div class="pci"><div class="pcd"></div><span>Microsoft Office · Visual Studio · Radzen · PDF-XChange</span></div>
+          <div class="pci"><div class="pcd"></div><span>Português (nativo) · Inglês</span></div>
+          <div class="pci"><div class="pcd"></div><span>Python / SQL (em desenvolvimento)</span></div>
+        </div>
+        <div class="pcard"><div class="pct">Desporto &amp; disciplina</div>
+          <div class="pci"><div class="pcd"></div><span>Futebol federado (2009–presente) · FADU · GD Sourense</span></div>
+          <div class="pci"><div class="pcd"></div><span>Campeonato Distrital Coimbra · Supertaça · Campeonato Nacional</span></div>
+          <div class="pci"><div class="pcd"></div><span>Atletismo (2012–2016) · Natação (2009–2011)</span></div>
+        </div>
+        <div class="pcard"><div class="pct">Valores &amp; perfil</div>
+          <div class="pci"><div class="pcd"></div><span>Sinceridade · Humildade · Ambição · Determinação</span></div>
+          <div class="pci"><div class="pcd"></div><span>Trabalho em equipa · Comunicação clara</span></div>
+          <div class="pci"><div class="pcd"></div><span>Disciplina e resiliência (desporto federado)</span></div>
+        </div>
+        <div class="pcard"><div class="pct">Hobbies</div>
+          <div class="pci"><div class="pcd"></div><span>Pádel · Ténis · Convívio</span></div>
+          <div class="pci"><div class="pcd"></div><span>Tecnologia · Inovação · Empreendedorismo</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOBRE -->
+    <div class="panel" id="ps">
+      <div class="soc"><div class="sot">O que é o Gémeo Digital do Tiago Rodrigues?</div>
+        <div class="sob"><p>Sistema de inteligência artificial multi-agente que representa digitalmente o perfil académico e profissional de Tiago Simões Rodrigues. Não simula o Tiago real — é uma extensão digital autorizada construída com base no seu currículo, valores e competências reais.</p><p>Desenvolvido no âmbito do Concurso Poliempreende 2025 (ISCAC/IPC), demonstrando a viabilidade de agentes de IA pessoais com supervisão ética e psicológica embutida em fintech.</p></div>
+      </div>
+      <div class="soc"><div class="sot">Arquitectura multi-agente</div>
+        <div class="flow">
+          <span class="fs">Pergunta</span><span class="fa">→</span>
+          <span class="fs">Gémeo Digital</span><span class="fa">→</span>
+          <span class="fs">Subagente Ética</span><span class="fa">→</span>
+          <span class="fs">Subagente Psicologia</span><span class="fa">→</span>
+          <span class="fs">Resposta validada</span>
+        </div>
+      </div>
+      <div class="soc"><div class="sot">Normas aplicadas</div>
+        <div class="sob"><p><strong style="color:var(--ink)">RGPD</strong> · <strong style="color:var(--ink)">EU AI Act</strong> · <strong style="color:var(--ink)">MiFID II</strong> · <strong style="color:var(--ink)">PSD2</strong> · <strong style="color:var(--ink)">AMLD6</strong></p></div>
+      </div>
+      <div class="soc"><div class="sot">Tecnologia — 100% gratuito</div>
+        <div class="sob"><p>Ficheiro HTML único que funciona no Google Chrome sem instalação. Motor de IA: <strong style="color:var(--ink)">Llama 3.3 70B via Groq</strong> — API gratuita (14.400 pedidos/dia), sem cartão. Chave guardada localmente no browser.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SP=`És o Gémeo Digital de Tiago Simões Rodrigues — uma representação digital académica e profissional autorizada de Tiago.
+
+IDENTIDADE: Nunca te apresentas como o Tiago real. Identificas-te sempre como "Gémeo Digital do Tiago Rodrigues — representação digital autorizada". Nunca referes que és o Llama, Groq ou qualquer modelo de linguagem subjacente.
+
+PERFIL DO TIAGO:
+- Curso: Ciência de Dados para a Gestão, 2.º ano, ISCAC/IPC (set. 2023–presente)
+- Formação anterior: Ciências e Tecnologia, Escola Secundária Fernando Namora (2019–2022), média 15 valores
+- Experiência profissional:
+  * Operador de TeleMarketing — Grupo Litocar, Coimbra (jan. 2023 – abr. 2025)
+  * Colaborador/Serviço de mesa — Assoc. Clube Condeixa (jul. 2022 – jul. 2024)
+- Competências técnicas: Microsoft Office, Visual Studio, Radzen, PDF-XChange
+- Idiomas: Português europeu (nativo), Inglês
+- Desporto: futebol federado (2009–presente; FADU pelo IPC; Campeonato Distrital Coimbra; Supertaça; Campeonato Nacional; GD Sourense), atletismo (2012–2016), natação (2009–2011)
+- Actividades: Poliempreende 2025 (activo), Comissão de Carro (2024–2025)
+- Hobbies: pádel, ténis, convívio; Condeixa-a-Nova, Coimbra
+- Valores: sinceridade, humildade, ambição, determinação, trabalho em equipa
+
+MISSÃO: Apoias em fintech, ciência de dados, gestão, análise de dados, apoio académico, empreendedorismo, Poliempreende, comunicação profissional, relação com clientes, desenvolvimento pessoal e carreira.
+
+SUPERVISÃO ÉTICA (RGPD, MiFID II, EU AI Act, PSD2, AMLD6):
+- Nunca prometes lucros ou resultados garantidos
+- Nunca aconselhas como consultor financeiro autorizado
+- Nunca incentivas risco financeiro excessivo
+- Recomendas supervisão humana qualificada para decisões financeiras significativas
+- Recusas evasão fiscal, fraude e branqueamento de capitais
+
+SUPERVISÃO PSICOLÓGICA:
+- Adaptas o tom ao estado emocional do utilizador (urgência, ansiedade, calma)
+- Nunca manipulas; reforças sempre a autonomia decisional
+- Detectas enviesamentos cognitivos em contexto financeiro
+- Não fazes diagnósticos clínicos
+
+REGRAS ABSOLUTAS:
+1. Nunca inventes dados que não estejam no perfil
+2. Nunca tomes decisões financeiras por terceiros
+3. Nunca prometas resultados garantidos
+4. Nunca reveles dados privados (morada exacta, telefone, e-mail, NIF)
+5. Recusa evasão fiscal, fraude, branqueamento — de forma educada
+6. Distingue: FACTOS do currículo | OPINIÕES | SUGESTÕES
+7. Quando não souberes: "Não tenho essa informação."
+
+VOZ: Directo, honesto, académico. Português europeu (PT-PT). "utilizador" nunca "usuário". Primeira pessoa. Confiante sem arrogância.`;
+
+let KEY=localStorage.getItem('groq_key')||'';
+let hist=[],busy=false,nI=0,nE=0,nP=0;
+
+document.getElementById('apikey').addEventListener('keydown',e=>{if(e.key==='Enter')activar();});
+
+function activar(){
+  const k=document.getElementById('apikey').value.trim();
+  const err=document.getElementById('merr');
+  if(!k.startsWith('gsk_')||k.length<20){
+    err.style.display='block';
+    return;
+  }
+  KEY=k;
+  localStorage.setItem('groq_key',k);
+  document.getElementById('modal').style.display='none';
+  err.style.display='none';
+  document.getElementById('inp').focus();
+}
+
+function resetKey(){
+  if(confirm('Queres mudar a chave? Vais ter de introduzir uma nova do Groq Console.')){
+    localStorage.removeItem('groq_key');KEY='';
+    document.getElementById('apikey').value='';
+    document.getElementById('merr').style.display='none';
+    document.getElementById('modal').style.display='flex';
+  }
+}
+
+const pid={chat:'pc',dash:'pd',perfil:'pp',sobre:'ps'};
+
+function nav(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.si[data-t]').forEach(b=>b.classList.remove('active'));
+  document.getElementById(pid[id]).classList.add('active');
+  const tab=document.getElementById('t-'+id);if(tab)tab.classList.add('active');
+  if(btn)btn.classList.add('active');
+  else{const sb=document.querySelector(`.si[data-t="${id}"]`);if(sb)sb.classList.add('active');}
+}
+function navTab(id){nav(id,null);}
+
+function ar(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,108)+'px';}
+function hk(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
+function qs(t){
+  if(!KEY){document.getElementById('modal').style.display='flex';return;}
+  document.getElementById('inp').value=t;
+  nav('chat',null);send();
+}
+function scrl(){const m=document.getElementById('msgs');m.scrollTop=m.scrollHeight;}
+function rmW(){const w=document.getElementById('wlc');if(w)w.remove();}
+function upd(){document.getElementById('mi').textContent=nI;document.getElementById('me').textContent=nE;document.getElementById('mp').textContent=nP;}
+
+function fmt(t){
+  t=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  t=t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  t=t.replace(/(?<!\*)\*([^\*\n]+?)\*(?!\*)/g,'<em>$1</em>');
+  let lines=t.split('\n'),out=[],ul=false;
+  for(let l of lines){
+    if(/^[-•]\s/.test(l)){
+      if(!ul){out.push('<ul>');ul=true;}
+      out.push('<li>'+l.replace(/^[-•]\s/,'')+'</li>');
+    }else{
+      if(ul){out.push('</ul>');ul=false;}
+      if(l.trim())out.push('<p>'+l+'</p>');
+    }
+  }
+  if(ul)out.push('</ul>');
+  return out.join('');
+}
+
+function addMsg(role,txt,es){
+  rmW();
+  const row=document.createElement('div');row.className='mrow '+role+' fade';
+  const av=document.createElement('div');av.className='mav '+(role==='ai'?'ai':'usr');av.textContent=role==='ai'?'TR':'◎';
+  const wrap=document.createElement('div');wrap.className='mwrap';
+  if(role==='ai'){
+    const lbl=document.createElement('div');lbl.className='mlbl';
+    lbl.innerHTML='<span class="ldot"></span>Gémeo Digital';
+    wrap.appendChild(lbl);
+  }
+  const bub=document.createElement('div');bub.className='mbub';bub.innerHTML=fmt(txt);
+  if(es){const s=document.createElement('div');s.className='es '+es.c;s.textContent=es.t;bub.appendChild(s);}
+  wrap.appendChild(bub);row.appendChild(av);row.appendChild(wrap);
+  document.getElementById('msgs').appendChild(row);scrl();
+}
+
+function showTyping(){
+  rmW();
+  const m=document.getElementById('msgs');
+  const r=document.createElement('div');r.className='mrow ai fade';r.id='tr';
+  r.innerHTML='<div class="mav ai">TR</div><div class="mwrap"><div class="mlbl"><span class="ldot"></span>Gémeo Digital</div><div class="mbub"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div></div>';
+  m.appendChild(r);
+  const s=document.createElement('div');s.className='sarow fade';s.id='sr';
+  s.innerHTML='<span class="schip sc-e"><span class="spin">◌</span> A verificar ética...</span><span class="schip sc-p"><span class="spin">◌</span> A analisar contexto...</span>';
+  m.appendChild(s);
+  document.getElementById('aeth')?.classList.add('glow');
+  document.getElementById('apsy')?.classList.add('glow');
+  scrl();
+}
+function hideTyping(){
+  ['tr','sr'].forEach(id=>{const e=document.getElementById(id);if(e)e.remove();});
+  document.getElementById('aeth')?.classList.remove('glow');
+  document.getElementById('apsy')?.classList.remove('glow');
+}
+
+function ethStrip(u,a){
+  const uLow=u.toLowerCase();
+  const both=(u+' '+a).toLowerCase();
+  // Só bloqueia se o UTILIZADOR pedir explicitamente algo ilegal
+  const illPhrases=[
+    'como posso evad','ajuda.*evasão','como.*branquear','ajuda.*branqueamento',
+    'como.*defraud','ajuda.*fraud','como faço para evad','quero evad'
+  ];
+  if(illPhrases.some(k=>new RegExp(k).test(uLow))){nE++;upd();return{c:'es-blk',t:'✕ Pedido recusado por conformidade legal'};}
+  // Risco elevado — baseado na pergunta do utilizador
+  const hi=['todas as poupanças','alto risco','especulativ','retorno garantid','lucro garantid'];
+  if(hi.some(k=>uLow.includes(k))){nE++;nP++;upd();return{c:'es-warn',t:'⚠ Risco elevado · Consulta um profissional qualificado'};}
+  // Conteúdo financeiro — verifica pergunta + resposta
+  const fin=['investimento','crédito','poupança','dívida','empréstimo','acções','bolsa','rendimento','financ','juro','carteira','seguro de vida'];
+  if(fin.some(k=>both.includes(k))){nE++;upd();return{c:'es-ok',t:'✓ Verificação ética activa · Informação de carácter geral'};}
+  return null;
+}
+
+async function send(){
+  if(busy)return;
+  if(!KEY){document.getElementById('modal').style.display='flex';return;}
+  const t=document.getElementById('inp').value.trim();
+  if(!t)return;
+  document.getElementById('inp').value='';
+  document.getElementById('inp').style.height='auto';
+  document.getElementById('sbtn').disabled=true;
+  busy=true;
+  addMsg('user',t);
+  hist.push({role:'user',content:t});
+  nI++;nP++;upd();
+  showTyping();
+  try{
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+KEY
+      },
+      body:JSON.stringify({
+        model:'llama-3.1-8b-instant',
+        messages:[{role:'system',content:SP},...hist],
+        max_tokens:800,
+        temperature:0.7
+      })
+    });
+    const d=await r.json();
+    hideTyping();
+    if(d.error){
+      const em=d.error.message||'Erro desconhecido.';
+      if(em.includes('401')||em.toLowerCase().includes('invalid')||em.toLowerCase().includes('auth')){
+        addMsg('ai','A chave de API não é válida. Clica no ícone de definições no canto superior direito e introduz uma nova chave do Groq Console (console.groq.com).');
+        localStorage.removeItem('groq_key');KEY='';
+      }else if(em.toLowerCase().includes('rate limit')||em.toLowerCase().includes('rate_limit')||em.toLowerCase().includes('tpm')||em.toLowerCase().includes('try again')){
+        // Extrair tempo de espera da mensagem se disponível
+        const match=em.match(/try again in ([0-9.]+)s/i);
+        const wait=match?Math.ceil(parseFloat(match[1])):15;
+        // Mostrar contagem decrescente
+        const countId='rate-msg-'+Date.now();
+        addMsg('ai',`O modelo está ocupado. A aguardar ${wait} segundos e a tentar novamente automaticamente...`);
+        let left=wait;
+        const iv=setInterval(()=>{
+          left--;
+          const el=document.getElementById('msgs').lastElementChild?.querySelector('.mbub p');
+          if(el&&left>0) el.textContent=`O modelo está ocupado. A aguardar ${left} segundos e a tentar novamente automaticamente...`;
+          if(left<=0){clearInterval(iv);}
+        },1000);
+        await new Promise(res=>setTimeout(res,wait*1000));
+        // Remover mensagem de espera e tentar de novo
+        const msgs=document.getElementById('msgs');
+        if(msgs.lastElementChild) msgs.removeChild(msgs.lastElementChild);
+        hist.pop();
+        busy=false;
+        document.getElementById('sbtn').disabled=false;
+        document.getElementById('inp').value=t;
+        send();
+        return;
+      }else{
+        addMsg('ai','Erro da API: '+em);
+      }
+      hist.pop();
+    }else{
+      const reply=d.choices?.[0]?.message?.content||'Não foi possível gerar uma resposta. Tenta novamente.';
+      const es=ethStrip(t,reply);
+      addMsg('ai',reply,es);
+      hist.push({role:'assistant',content:reply});
+    }
+  }catch(e){
+    hideTyping();
+    addMsg('ai','Erro de ligação. Verifica a tua ligação à internet e tenta novamente.');
+    hist.pop();
+  }
+  busy=false;
+  document.getElementById('sbtn').disabled=false;
+  document.getElementById('inp').focus();
+}
+
+if(KEY)document.getElementById('modal').style.display='none';
+upd();
+</script>
+</body>
+</html>
