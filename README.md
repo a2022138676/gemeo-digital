@@ -1,7 +1,7 @@
 # 🧬 Gémeo Digital do Tiago Rodrigues
 
 **Tiago Simões Rodrigues** — 2022138676
-Ciência de Dados para a Gestão · ISCAC / IPC · Cadeira de Fintech · 2025/2026
+Ciência de Dados para a Gestão · ISCAC · Cadeira de Fintech · 2025/2026
 
 > Agente de inteligência artificial que me representa digitalmente — com base no meu currículo real, nos meus valores e na minha forma de comunicar, orientado para o domínio fintech.
 
@@ -38,7 +38,7 @@ Normas verificadas:
 - **PSD2** (Dir. 2015/2366) — serviços de pagamento
 - **AMLD6** (Dir. 2018/1673) — prevenção de branqueamento de capitais
 
-Veredictos possíveis: `✅ Aprovado` · `⚠️ Aprovado com condições` · `❌ Vetado`
+Vereditos possíveis: `✅ Aprovado` · `⚠️ Aprovado com condições` · `❌ Vetado`
 
 ### 🧠 Subagente de Psicologia Comportamental
 Analisa o tom da mensagem e adapta a resposta ao estado emocional do utilizador. Detecta enviesamentos cognitivos comuns em contexto financeiro:
@@ -52,7 +52,7 @@ Analisa o tom da mensagem e adapta a resposta ao estado emocional do utilizador.
 | Sunk Cost | Manter uma posição perdedora por inércia |
 | Viés de recência | Decidir só com base nos últimos acontecimentos |
 
-> O objectivo é sempre ajudar o utilizador a decidir melhor — nunca manipulá-lo.
+> O objetivo é sempre ajudar o utilizador a decidir melhor, nunca manipulá-lo.
 
 ---
 
@@ -63,7 +63,7 @@ Analisa o tom da mensagem e adapta a resposta ao estado emocional do utilizador.
 | 💬 Conversa | Chat com o Gémeo Digital em tempo real |
 | 📊 Dashboard | Métricas da sessão (verificações éticas, análises psicológicas) |
 | 👤 Perfil | Currículo completo do Tiago |
-| ℹ️ Sobre | Arquitectura do projecto e normas aplicadas |
+| ℹ️ Sobre | Arquitetura do projeto e normas aplicadas |
 
 Cada resposta inclui uma **faixa de validação ética**:
 
@@ -79,7 +79,7 @@ Cada resposta inclui uma **faixa de validação ética**:
 
 **2.** Abre [gemeo-digital.vercel.app](https://gemeo-digital.vercel.app)
 
-**3.** Cola a chave (começa por `gsk_...`) na janela que aparece e clica em **Activar**
+**3.** Cola a chave (começa por `gsk_...`) na janela que aparece e clica em **Ativar**
 
 **4.** Começa a conversar — a chave fica guardada no browser, só precisas de fazer isto uma vez
 
@@ -90,7 +90,7 @@ Cada resposta inclui uma **faixa de validação ética**:
 | Componente | Detalhe |
 |---|---|
 | Motor de IA | Llama 3.1 8B Instant via Groq API |
-| Frontend | HTML5 + CSS3 + JavaScript puro |
+| Frontend | HTML5 + CSS3 + JavaScript |
 | Deploy | Vercel — gratuito, sem servidor |
 | Armazenamento | localStorage do browser |
 
