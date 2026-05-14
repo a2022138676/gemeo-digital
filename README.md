@@ -106,6 +106,13 @@ Verificador normativo automático para agentes de IA em serviços financeiros. C
 **📊 Behavioral Finance Analyzer**
 Detecção de enviesamentos cognitivos financeiros em sistemas conversacionais. Baseado em Kahneman & Tversky, Deci & Ryan e Thaler & Sunstein.
 
+**👤 Personal Identity Skill**
+Guia para construir um agente com identidade pessoal verificável, ancorada num perfil real documentado.
+
+**⭐ Critical Evaluator Skill**
+Agente avaliador crítico académico para auto-avaliação de projectos de IA.
+
+
 ---
 
 *Representação digital autorizada. O agente nunca se apresenta como o Tiago real.*
