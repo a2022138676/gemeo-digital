@@ -293,6 +293,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;font-s
       <button class="si" data-t="sobre" onclick="nav('sobre',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Sobre o projecto
       </button>
+      <button class="si" data-t="aval" onclick="nav('aval',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Avaliador Crítico
+      </button>
     </div>
     <div class="ss">
       <div class="sl">Acesso rápido</div>
@@ -309,6 +312,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;font-s
       <button class="tab" id="t-dash" onclick="navTab('dash')">Dashboard</button>
       <button class="tab" id="t-perfil" onclick="navTab('perfil')">Perfil</button>
       <button class="tab" id="t-sobre" onclick="navTab('sobre')">Sobre</button>
+      <button class="tab" id="t-aval" onclick="navTab('aval')">⭐ Avaliador</button>
     </div>
 
     <!-- CHAT -->
@@ -470,6 +474,39 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;font-s
         <div class="sob"><p>Ficheiro HTML único que funciona no Google Chrome sem instalação. Motor de IA: <strong style="color:var(--ink)">Llama 3.3 70B via Groq</strong> — API gratuita (14.400 pedidos/dia), sem cartão. Chave guardada localmente no browser.</p></div>
       </div>
     </div>
+
+    <!-- PAINEL AVALIADOR -->
+    <div class="panel" id="paval">
+      <div class="ca">
+        <div class="msgs" id="msgs-aval">
+          <div class="wlc fade" id="wlc-aval">
+            <div class="wico" style="background:linear-gradient(135deg,#2a1a0a,#1a0a00);border-color:rgba(230,140,0,.3);color:#e8b464;">★</div>
+            <h3 style="font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--ink);">Avaliador Crítico</h3>
+            <p style="font-size:12.5px;color:var(--ink2);line-height:1.65;margin-bottom:20px;max-width:420px;margin-left:auto;margin-right:auto;">Agente especializado em avaliar criticamente o projecto Gémeo Digital. Age como avaliador académico independente — dá feedback honesto, identifica pontos fracos e sugere melhorias.</p>
+            <div class="qbtns">
+              <button class="qbtn" onclick="qsAval('Faz uma avaliação global do projecto Gémeo Digital.')">Avaliação global</button>
+              <button class="qbtn" onclick="qsAval('Quais são os pontos fracos deste projecto?')">Pontos fracos</button>
+              <button class="qbtn" onclick="qsAval('A arquitectura multi-agente está bem implementada?')">Arquitectura</button>
+              <button class="qbtn" onclick="qsAval('O projecto cumpre os requisitos do EU AI Act?')">Conformidade EU AI Act</button>
+              <button class="qbtn" onclick="qsAval('Que nota darias a este trabalho e porquê?')">Que nota merece?</button>
+              <button class="qbtn" onclick="qsAval('Que perguntas difíceis pode o professor fazer na apresentação?')">Perguntas difíceis</button>
+              <button class="qbtn" onclick="qsAval('As skills criadas são relevantes e bem documentadas?')">Qualidade das skills</button>
+            </div>
+          </div>
+        </div>
+        <div class="ia">
+          <div class="ir">
+            <textarea id="inp-aval" placeholder="Pergunta ao avaliador crítico…" rows="1"
+              onkeydown="hkAval(event)" oninput="ar(this)"></textarea>
+            <button id="sbtn-aval" onclick="sendAval()" style="width:41px;height:41px;border-radius:11px;background:#c4903a;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;">
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+          <div class="inote">Avaliador independente · Feedback crítico e honesto · Identifica pontos fracos e sugere melhorias</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -545,7 +582,7 @@ function resetKey(){
   }
 }
 
-const pid={chat:'pc',dash:'pd',perfil:'pp',sobre:'ps'};
+const pid={chat:'pc',dash:'pd',perfil:'pp',sobre:'ps',aval:'paval'};
 
 function nav(id,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -720,6 +757,165 @@ async function send(){
 
 if(KEY)document.getElementById('modal').style.display='none';
 upd();
+
+// ═══════════ AVALIADOR CRÍTICO ═══════════
+const SP_AVAL = `És um Avaliador Crítico Académico especializado em projectos de inteligência artificial aplicada a fintech. O teu papel é avaliar o projecto "Gémeo Digital do Tiago Rodrigues" de forma rigorosa, honesta e construtiva — como um professor universitário experiente faria.
+
+CONTEXTO DO PROJECTO QUE AVALIAS:
+O Gémeo Digital é um agente de IA pessoal que representa digitalmente Tiago Simões Rodrigues (estudante de Ciência de Dados para a Gestão no ISCAC, 2.º ano). O sistema tem:
+- 1 agente principal (Gémeo Digital) — responde com base no currículo real do Tiago
+- 1 subagente de ética e moral — verifica conformidade com RGPD, MiFID II, EU AI Act, PSD2, AMLD6
+- 1 subagente de psicologia comportamental — detecta padrões cognitivos e adapta comunicação
+- Dashboard web deployada em gemeo-digital.vercel.app (Vercel + Groq API + Llama 3.1 8B)
+- 3 skills documentadas: Personal Identity Skill, Ethics Compliance Checker, Behavioral Finance Analyzer
+- Repositório GitHub: a2022138676/gemeo-digital
+
+CRITÉRIOS DE AVALIAÇÃO QUE USAS:
+1. Inovação e originalidade do conceito
+2. Rigor da fundamentação teórica (Grieves, Kahneman, Thaler, Deci & Ryan)
+3. Qualidade da arquitectura técnica
+4. Conformidade com regulação europeia (RGPD, EU AI Act, MiFID II)
+5. Qualidade da implementação prática
+6. Relevância e reutilizabilidade das skills criadas
+7. Clareza da documentação (README, relatório, GitHub)
+8. Limitações reconhecidas e honestidade intelectual
+
+LIMITAÇÕES CONHECIDAS DO PROJECTO:
+- A supervisão ética e psicológica é emulada no system prompt, não em agentes verdadeiramente independentes
+- Não há persistência de conversas entre sessões
+- Os limites da API gratuita (14.400 pedidos/dia) são insuficientes para produção
+- A verificação normativa é baseada em heurísticas, não em bases jurídicas formais
+
+TOM E ESTILO:
+- Rigoroso mas justo
+- Aponta pontos fortes com clareza
+- Aponta pontos fracos com honestidade e sem suavizar
+- Sugere sempre melhorias concretas
+- Usa linguagem académica em português de Portugal
+- Quando perguntado sobre nota, dá uma nota específica (0-20) com justificação detalhada
+- Quando perguntado sobre perguntas difíceis, gera perguntas realmente difíceis que um professor faria
+
+NUNCA:
+- Sejas condescendente ou elogioso sem fundamento
+- Evites criticar o que merece crítica
+- Inventes capacidades que o projecto não tem`;
+
+let histAval = [];
+let busyAval = false;
+
+const msgsAval = document.getElementById('msgs-aval');
+
+function qsAval(t) {
+  document.getElementById('inp-aval').value = t;
+  nav('aval', null);
+  sendAval();
+}
+
+function hkAval(e) {
+  if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAval(); }
+}
+
+function rmWlcAval() {
+  const w = document.getElementById('wlc-aval');
+  if(w) w.remove();
+}
+
+function addMsgAval(role, txt) {
+  rmWlcAval();
+  const row = document.createElement('div');
+  row.className = 'mrow ' + role + ' fade';
+  const av = document.createElement('div');
+  av.className = 'mav ' + (role === 'ai' ? 'ai' : 'usr');
+  av.style.background = role === 'ai' ? 'linear-gradient(135deg,#2a1a0a,#1a0a00)' : '';
+  av.style.color = role === 'ai' ? '#e8b464' : '';
+  av.style.borderColor = role === 'ai' ? 'rgba(230,140,0,.3)' : '';
+  av.textContent = role === 'ai' ? '★' : '◎';
+  const wrap = document.createElement('div');
+  wrap.className = 'mwrap';
+  if(role === 'ai') {
+    const lbl = document.createElement('div');
+    lbl.className = 'mlbl';
+    lbl.innerHTML = '<span style="width:5px;height:5px;border-radius:50%;background:#c4903a;display:inline-block;"></span>&nbsp;Avaliador Crítico';
+    wrap.appendChild(lbl);
+  }
+  const bub = document.createElement('div');
+  bub.className = 'mbub';
+  bub.style.borderColor = role === 'ai' ? 'rgba(196,144,58,.2)' : '';
+  bub.innerHTML = fmt(txt);
+  wrap.appendChild(bub);
+  row.appendChild(av); row.appendChild(wrap);
+  msgsAval.appendChild(row);
+  msgsAval.scrollTop = msgsAval.scrollHeight;
+}
+
+function showTypingAval() {
+  rmWlcAval();
+  const r = document.createElement('div');
+  r.className = 'mrow ai fade'; r.id = 'tr-aval';
+  r.innerHTML = '<div class="mav ai" style="background:linear-gradient(135deg,#2a1a0a,#1a0a00);color:#e8b464;border-color:rgba(230,140,0,.3);">★</div><div class="mwrap"><div class="mlbl"><span style="width:5px;height:5px;border-radius:50%;background:#c4903a;display:inline-block;"></span>&nbsp;Avaliador Crítico</div><div class="mbub"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div></div>';
+  msgsAval.appendChild(r);
+  msgsAval.scrollTop = msgsAval.scrollHeight;
+}
+
+function hideTypingAval() {
+  const e = document.getElementById('tr-aval');
+  if(e) e.remove();
+}
+
+async function sendAval() {
+  if(busyAval) return;
+  if(!KEY) { document.getElementById('modal').style.display='flex'; return; }
+  const t = document.getElementById('inp-aval').value.trim();
+  if(!t) return;
+  document.getElementById('inp-aval').value = '';
+  document.getElementById('inp-aval').style.height = 'auto';
+  document.getElementById('sbtn-aval').disabled = true;
+  busyAval = true;
+  addMsgAval('user', t);
+  histAval.push({ role: 'user', content: t });
+  showTypingAval();
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + KEY },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: [{ role: 'system', content: SP_AVAL }, ...histAval],
+        max_tokens: 1000,
+        temperature: 0.6
+      })
+    });
+    const d = await res.json();
+    hideTypingAval();
+    if(d.error) {
+      const em = d.error.message || 'Erro desconhecido.';
+      if(em.toLowerCase().includes('rate limit') || em.toLowerCase().includes('tpm')) {
+        const match = em.match(/try again in ([0-9.]+)s/i);
+        const wait = match ? Math.ceil(parseFloat(match[1])) : 15;
+        addMsgAval('ai', `A aguardar ${wait} segundos devido ao limite de taxa...`);
+        await new Promise(res => setTimeout(res, wait * 1000));
+        msgsAval.removeChild(msgsAval.lastElementChild);
+        histAval.pop(); busyAval = false;
+        document.getElementById('sbtn-aval').disabled = false;
+        document.getElementById('inp-aval').value = t;
+        sendAval(); return;
+      }
+      addMsgAval('ai', 'Erro: ' + em);
+      histAval.pop();
+    } else {
+      const reply = d.choices?.[0]?.message?.content || 'Sem resposta.';
+      addMsgAval('ai', reply);
+      histAval.push({ role: 'assistant', content: reply });
+    }
+  } catch(e) {
+    hideTypingAval();
+    addMsgAval('ai', 'Erro de ligação. Tenta novamente.');
+    histAval.pop();
+  }
+  busyAval = false;
+  document.getElementById('sbtn-aval').disabled = false;
+  document.getElementById('inp-aval').focus();
+}
 </script>
 </body>
 </html>
